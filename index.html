@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kuiz Tembak Jawapan — Pendidikan Kesihatan Tahun 4</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#f3f7fb,#101827);--panel:light-dark(#fff,#1c2738);--ink:light-dark(#172033,#f2f5fb);--muted:light-dark(#5c687b,#aab6c8);--line:light-dark(#dce4ef,#36445a);--blue:light-dark(#2459d3,#82a9ff);--green:light-dark(#16845b,#55d6a4);--red:light-dark(#b83b45,#ff8990)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:760px;margin:auto;padding:18px 14px 32px}
+header{text-align:center;padding:8px 0 16px}h1{font-size:clamp(1.5rem,5vw,2.2rem);margin:0 0 7px}header p{color:var(--muted);margin:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 25px #0000000b}
+.topline{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:.92rem}
+.progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:10px 0 18px}.bar{height:100%;width:10%;background:var(--blue);transition:width .2s}
+h2{font-size:1.22rem;line-height:1.4;margin:0 0 14px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.choice{border:2px solid var(--line);background:transparent;color:var(--ink);border-radius:15px;padding:15px 12px;text-align:left;min-height:78px;font-size:1rem;font-weight:650;cursor:pointer}
+.choice strong{display:inline-grid;place-items:center;background:var(--line);border-radius:9px;width:30px;height:30px;margin-right:7px}
+.choice.selected{border-color:var(--blue);background:light-dark(#eaf0ff,#23365b)}
+.choice.correct{border-color:var(--green);background:light-dark(#e5f8ef,#153d34)}
+.choice.wrong{border-color:var(--red);background:light-dark(#fff0f0,#4b252d)}
+button{font:inherit;font-weight:700;border:0;border-radius:13px;padding:12px 16px;cursor:pointer}
+.primary{background:var(--blue);color:white}.secondary{background:var(--line);color:var(--ink)}button:disabled{opacity:.45;cursor:not-allowed}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+.camera-wrap{position:relative;overflow:hidden;border-radius:16px;background:#05070b;aspect-ratio:4/3;max-height:320px}
+video,canvas{position:absolute;width:100%;height:100%;inset:0;object-fit:cover;transform:scaleX(-1)}
+.camera-label{position:absolute;left:10px;right:10px;bottom:10px;background:#000a;color:#fff;padding:8px 10px;border-radius:10px;font-size:.88rem;z-index:4}.aim-grid{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;z-index:2;pointer-events:none}.aim-target{margin:5px;border:2px solid #ffffffb8;border-radius:13px;background:#10203370;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:7px;font-size:clamp(.72rem,2.5vw,1rem);font-weight:750;text-shadow:0 1px 4px #000;transition:background .1s,border-color .1s,transform .1s}.aim-target em{display:inline-grid;place-items:center;font-style:normal;background:#fff;color:#172033;border-radius:50%;width:26px;height:26px;margin-right:6px;flex-shrink:0}.aim-target.targeted{border:4px solid #ffdf4d;background:#ffdf4d55;transform:scale(.98);box-shadow:0 0 0 3px #ffdf4d55}.aim-grid .aim-target{min-width:0}
+.status{padding:10px 12px;border-radius:12px;background:light-dark(#edf2fa,#253146);font-size:.92rem;margin-top:10px}
+.legend{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}.legend div{text-align:center;padding:8px 4px;border:1px solid var(--line);border-radius:10px;font-size:.82rem}
+.small{color:var(--muted);font-size:.88rem;line-height:1.5}
+.feedback{margin-top:12px;padding:12px;border-radius:12px;background:light-dark(#edf2fa,#253146);line-height:1.45}
+.hide{display:none!important}
+@media(max-width:420px){main{padding:12px 10px 24px}.panel{padding:13px}.choice{font-size:.93rem;padding:12px 9px;min-height:72px}.legend{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<main>
+<header><h1>🎯 Kuiz Tembak Jawapan</h1><p>Pendidikan Kesihatan • Tahun 4</p></header>
+<section class="panel">
+ <div class="topline"><span id="qcount">Soalan 1 daripada 10</span><span>Markah: <b id="score">0</b></span></div>
+ <div class="progress"><div class="bar" id="bar"></div></div>
+ <h2 id="question"></h2>
+ <div class="choices" id="choices"></div>
+ <div id="feedback" class="feedback hide" aria-live="polite"></div>
+ <div class="controls"><button class="primary" id="check" disabled>Semak jawapan</button><button class="secondary" id="next" disabled>Soalan seterusnya →</button></div>
+</section>
+<section class="panel">
+ <h2>🤏🔫 Tunjuk jari pistol dan tembak jawapan</h2>
+ <p class="small">Tekan “Aktifkan kamera”. Dalam paparan kamera ini, empat sasaran jawapan akan muncul. Bentuk jari seperti pistol, gerakkan hujung telunjuk ke atas sasaran jawapan yang dikehendaki sehingga kotaknya menyala kuning, kemudian rapatkan ibu jari ke telunjuk seperti menarik picu untuk menembak. Jawapan dipilih berdasarkan kedudukan hujung jari dalam paparan kamera, bukan tekaan arah jari.</p>
+ <div class="camera-wrap"><video id="video" autoplay playsinline muted></video><canvas id="overlay"></canvas><div class="aim-grid" id="aimGrid"><div class="aim-target" data-target="0"><em>A</em><span id="aim0">Jawapan A</span></div><div class="aim-target" data-target="1"><em>B</em><span id="aim1">Jawapan B</span></div><div class="aim-target" data-target="2"><em>C</em><span id="aim2">Jawapan C</span></div><div class="aim-target" data-target="3"><em>D</em><span id="aim3">Jawapan D</span></div></div><div class="camera-label" id="cameraLabel">Kamera belum diaktifkan</div></div>
+ <div class="status" id="status">Tekan butang untuk mengaktifkan kamera. Halakan jari pistol, kemudian rapatkan hujung ibu jari dan telunjuk untuk menembak pilihan.</div>
+ <div class="controls"><button class="primary" id="startCamera">Aktifkan kamera</button><button class="secondary" id="stopCamera" disabled>Matikan kamera</button></div>
+ <p class="small">Petua: sasarkan kotak jawapan di dalam paparan kamera, bukan butang kuiz di luar paparan kamera. Tunggu kotak sasaran menyala kuning sebelum menarik picu. Pastikan tangan jelas kelihatan dan pencahayaan mencukupi. Pilihan pada kuiz masih boleh ditekan secara manual.</p>
+</section>
+<section class="panel hide" id="results"><h2>Keputusan kuiz</h2><p id="finalScore"></p><button class="primary" id="restart">Main semula</button></section>
+</main>
+<script type="module">
+import { FilesetResolver, HandLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+const data=[
+{q:"Antara berikut, yang manakah menyebabkan pencemaran udara?",a:["Menanam pokok","Asap kenderaan","Mengitar semula","Membersihkan taman"],k:1,why:"Asap kenderaan membebaskan bahan pencemar ke udara."},
+{q:"Penyakit manakah boleh menyebabkan saluran pernafasan menyempit dan sukar bernafas?",a:["Asma","Kolera","Demam denggi","Keracunan makanan"],k:0,why:"Asma boleh menyebabkan saluran pernafasan menyempit dan sesak nafas."},
+{q:"Apakah gejala yang biasa dialami akibat keracunan makanan?",a:["Sakit gigi","Kuku panjang","Muntah dan cirit-birit","Rambut gugur"],k:2,why:"Keracunan makanan boleh menyebabkan muntah, cirit-birit dan sakit perut."},
+{q:"Apakah tindakan sebelum makan untuk mengurangkan risiko pencemaran makanan?",a:["Bermain di luar","Membasuh tangan","Menyentuh sampah","Membiarkan makanan terbuka"],k:1,why:"Membasuh tangan dengan sabun membantu menghilangkan kuman."},
+{q:"Apakah keadaan yang boleh meningkatkan risiko strok haba?",a:["Berehat di tempat teduh","Minum air secukupnya","Bermain lama di bawah panas terik","Berehat di tempat sejuk"],k:2,why:"Pendedahan lama kepada panas terik boleh meningkatkan risiko strok haba."},
+{q:"Nyamuk Aedes boleh menyebarkan penyakit apakah?",a:["Asma","Demam denggi","Bronkitis","Keracunan makanan"],k:1,why:"Nyamuk Aedes yang dijangkiti virus denggi boleh menyebarkan penyakit ini."},
+{q:"Apakah maksud kawalan vektor?",a:["Mengawal organisma pembawa penyakit","Menambah jumlah sampah","Menyediakan makanan","Menghias bilik darjah"],k:0,why:"Kawalan vektor mengurangkan organisma seperti nyamuk yang boleh menyebarkan penyakit."},
+{q:"Yang manakah contoh amalan sanitasi yang baik?",a:["Membuang sampah ke longkang","Membiarkan tandas kotor","Membuang sampah ke dalam tong sampah","Membiarkan air bertakung"],k:2,why:"Membuang sampah dengan betul membantu mengekalkan kebersihan persekitaran."},
+{q:"Apakah tujuan pendidikan kesihatan di sekolah?",a:["Mengajar murid bermain sahaja","Memberikan pengetahuan menjaga kesihatan","Menggalakkan makanan tidak sihat","Mengurangkan masa belajar"],k:1,why:"Pendidikan kesihatan membantu murid memahami cara menjaga kesihatan dan mencegah penyakit."},
+{q:"Yang manakah contoh promosi kesihatan?",a:["Membiarkan sekolah kotor","Membakar sampah terbuka","Membuang sampah ke sungai","Mengadakan kempen kebersihan"],k:3,why:"Kempen kebersihan menggalakkan amalan yang menyokong kesihatan komuniti."}
+];
+let idx=0, selected=null, score=0, answered=false, stream=null, landmarker=null, raf=null, lastAutoAt=0, triggerWasPressed=false, targetHistory=[], currentTarget=null;
+const $=id=>document.getElementById(id);
+function render(){
+ const d=data[idx];selected=null;answered=false;targetHistory=[];currentTarget=null;
+ d.a.forEach((label,i)=>{const el=$("aim"+i);if(el)el.textContent=label;});
+ document.querySelectorAll(".aim-target").forEach(el=>el.classList.remove("targeted"));
+ $("qcount").textContent=`Soalan ${idx+1} daripada ${data.length}`;
+ $("score").textContent=score;$("bar").style.width=`${(idx+1)/data.length*100}%`;
+ $("question").textContent=d.q;$("feedback").classList.add("hide");$("feedback").textContent="";
+ $("choices").innerHTML="";
+ d.a.forEach((label,i)=>{const b=document.createElement("button");b.className="choice";b.innerHTML=`<strong>${"ABCD"[i]}</strong>${label}`;b.addEventListener("click",()=>choose(i));$("choices").appendChild(b)});
+ $("check").disabled=true;$("next").disabled=true;$("check").classList.remove("hide");$("next").textContent=idx===data.length-1?"Lihat keputusan →":"Soalan seterusnya →";
+}
+function choose(i){if(answered)return;selected=i;[...$("choices").children].forEach((b,j)=>b.classList.toggle("selected",j===i));$("check").disabled=false}
+function checkAnswer(){if(selected===null||answered)return;answered=true;const d=data[idx],ok=selected===d.k;if(ok)score++;$("score").textContent=score;[...$("choices").children].forEach((b,j)=>{b.disabled=true;if(j===d.k)b.classList.add("correct");else if(j===selected)b.classList.add("wrong")});$("feedback").textContent=(ok?"Bagus! Jawapan betul. ":"Belum tepat. Jawapan yang betul ialah "+ "ABCD"[d.k]+". ")+d.why;$("feedback").classList.remove("hide");$("check").disabled=true;$("next").disabled=false;if(idx===data.length-1)$("next").textContent="Lihat keputusan →"}
+function next(){if(!answered)return;if(idx<data.length-1){idx++;render()}else{$("results").classList.remove("hide");$("finalScore").textContent=`Markah anda: ${score} daripada ${data.length}.`; $("next").disabled=true;window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})}}
+function targetFromTip(lm){
+ // Paparan video dicerminkan (scaleX(-1)), jadi songsangkan X untuk sepadan dengan sasaran yang dilihat.
+ const x=1-lm[8].x, y=lm[8].y;
+ // Elakkan sasaran pinggir yang tidak stabil apabila hujung jari hampir garisan tengah.
+ const col=x<0.5?0:1, row=y<0.5?0:1;
+ return row===0?(col===0?0:1):(col===0?2:3);
+}
+function stableTarget(lm){
+ const t=targetFromTip(lm);targetHistory.push(t);
+ if(targetHistory.length>5)targetHistory.shift();
+ const counts=[0,0,0,0];targetHistory.forEach(x=>counts[x]++);
+ const best=counts.indexOf(Math.max(...counts));
+ return counts[best]>=3?best:null;
+}
+function fingerGunPose(lm){
+ // Telunjuk terulur; jari tengah, manis dan kelingking dibengkokkan.
+ const indexExtended = lm[8].y < lm[6].y;
+ const middleCurled = lm[12].y > lm[10].y;
+ const ringCurled = lm[16].y > lm[14].y;
+ const pinkyCurled = lm[20].y > lm[18].y;
+ return indexExtended && (middleCurled || ringCurled || pinkyCurled);
+}
+function triggerPressed(lm){
+ // “Tarik picu”: hujung ibu jari menghampiri bahagian tengah telunjuk.
+ const thumb=lm[4], indexBase=lm[5], indexJoint=lm[6];
+ const d1=Math.hypot(thumb.x-indexBase.x, thumb.y-indexBase.y);
+ const d2=Math.hypot(thumb.x-indexJoint.x, thumb.y-indexJoint.y);
+ return Math.min(d1,d2)<0.095;
+}
+async function cameraLoop(){
+ if(!landmarker||!stream)return;
+ const v=$("video");
+ if(v.readyState>=2){
+  const now=performance.now(),res=landmarker.detectForVideo(v,now),ctx=$("overlay").getContext("2d");
+  const c=$("overlay");if(c.width!==v.videoWidth||c.height!==v.videoHeight){c.width=v.videoWidth;c.height=v.videoHeight}
+  ctx.clearRect(0,0,c.width,c.height);
+  if(res.landmarks&&res.landmarks.length){
+   const lm=res.landmarks[0];ctx.fillStyle="#49f0b2";
+   for(const p of lm){ctx.beginPath();ctx.arc(p.x*c.width,p.y*c.height,Math.max(3,c.width*.004),0,Math.PI*2);ctx.fill()}
+   const d=stableTarget(lm),pose=fingerGunPose(lm),pressed=triggerPressed(lm);
+   currentTarget=d;
+   document.querySelectorAll(".aim-target").forEach((el,i)=>el.classList.toggle("targeted",d===i));
+   if(d!==null){
+    const label=data[idx].a[d];
+    $("cameraLabel").textContent=pose?"🎯 Sasaran "+"ABCD"[d]+": "+label:"Hujung jari menghala ke "+"ABCD"[d];
+    $("status").textContent=pose?"Sasaran "+"ABCD"[d]+" diserlahkan. Tarik picu dengan merapatkan ibu jari ke telunjuk untuk menembak.":"Bentuk jari pistol: telunjuk lurus dan jari lain dibengkokkan.";
+   } else {
+    $("cameraLabel").textContent="Gerakkan hujung telunjuk ke salah satu sasaran";
+   }
+   // Pilih sasaran berdasarkan lokasi hujung telunjuk; picu hanya mengesahkan tembakan.
+   if(pose && pressed && !triggerWasPressed && d!==null && !answered && now-lastAutoAt>1200){
+    choose(d);lastAutoAt=now;
+    $("status").textContent="💥 TEMBAK! Jawapan "+"ABCD"[d]+" dipilih. Tekan “Semak jawapan” untuk mengesahkan.";
+    $("cameraLabel").textContent="💥 TEMBAK! "+"ABCD"[d]+": "+data[idx].a[d];
+   }
+   triggerWasPressed=pressed;
+  }else{
+   $("cameraLabel").textContent="Tunjukkan tangan dalam kamera";
+   $("status").textContent="Tunjukkan tangan dan bentuk jari seperti pistol.";
+   triggerWasPressed=false;targetHistory=[];currentTarget=null;document.querySelectorAll(".aim-target").forEach(el=>el.classList.remove("targeted"));
+  }
+ }
+ raf=requestAnimationFrame(cameraLoop);
+}
+$("check").addEventListener("click",checkAnswer);$("next").addEventListener("click",next);
+$("restart").addEventListener("click",()=>{score=0;idx=0;$("results").classList.add("hide");render()});
+$("startCamera").addEventListener("click",async()=>{
+ try{
+  $("startCamera").disabled=true;$("status").textContent="Meminta kebenaran kamera…";
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});$("video").srcObject=stream;await $("video").play();
+  const vision=await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+  landmarker=await HandLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:"https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",delegate:"CPU"},runningMode:"VIDEO",numHands:1});
+  $("stopCamera").disabled=false;$("status").textContent="Kamera aktif. Bentuk jari pistol, halakan sasaran dan rapatkan ibu jari ke telunjuk untuk menembak.";cameraLoop();
+ }catch(e){$("status").textContent="Kamera tidak dapat diaktifkan. Buka halaman ini melalui HTTPS, benarkan akses kamera dan cuba lagi. Butiran: "+e.message;$("startCamera").disabled=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+});
+$("stopCamera").addEventListener("click",()=>{if(raf)cancelAnimationFrame(raf);targetHistory=[];currentTarget=null;triggerWasPressed=false;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;landmarker=null;$("video").srcObject=null;$("overlay").getContext("2d").clearRect(0,0,$("overlay").width,$("overlay").height);$("startCamera").disabled=false;$("stopCamera").disabled=true;$("cameraLabel").textContent="Kamera dimatikan";$("status").textContent="Kamera dimatikan."});
+render();
+</script>
+</body>
+</html>
